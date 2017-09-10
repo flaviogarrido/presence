@@ -254,7 +254,7 @@ func getLikelyLocations(last_seen_threshold int64, last_reading_threshold int64,
 	// iterate through the beacons we want to search for
 	for _, beacon := range BEACONS.Beacons {
 		// fmt.Printf("doing iteration and saw %s with ID %s\n", beacon_name, beacon_id)
-		fmt.Printf("num locs %d\n", len(locations))
+		// fmt.Printf("num locs %d\n", len(locations))
 		best_location := Best_location{}
 		//go through each location
 		now := time.Now().Unix()
@@ -358,10 +358,10 @@ func getLikelyLocations(last_seen_threshold int64, last_reading_threshold int64,
 				locations_list.locations[k] = location
 			}
 
-				log.Println("after clear")
-				for _, location := range locations {
-					log.Println(location.name, beacon.Name, len(location.found_beacons[beacon.Name].beacon_metrics))
-				}
+				// log.Println("after clear")
+				// for _, location := range locations {
+				// 	log.Println(location.name, beacon.Name, len(location.found_beacons[beacon.Name].beacon_metrics))
+				// }
 		}
 
 		beacon.Previous_location = best_location.name
