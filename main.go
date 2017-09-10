@@ -405,6 +405,8 @@ func getLikelyLocationsPoller(locations_list Locations_list, cl *client.Client) 
 
 func IncomingMQTTProcessor(updateInterval time.Duration, cl *client.Client, db *bolt.DB) chan<- Incoming_json {
 
+	fmt.Println("IncomingMQTTProcessor()")
+
 	incoming_msgs_chan := make(chan Incoming_json, 10)
 
 	// load initial BEACONS
@@ -568,6 +570,9 @@ func IncomingMQTTProcessor(updateInterval time.Duration, cl *client.Client, db *
 var http_host_path_ptr *string
 
 func main() {
+
+	fmt.Println("Main()")
+
 	http_host_path_ptr = flag.String("http_host_path", "localhost:5555", "The host:port that the HTTP server should listen on")
 
 	mqtt_host_ptr := flag.String("mqtt_host", "localhost:1883", "The host:port of the MQTT server to listen for Happy Bubbles beacons on")
