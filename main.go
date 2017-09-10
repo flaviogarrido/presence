@@ -243,6 +243,9 @@ func sendHARoomMessage(beacon_id string, beacon_name string, distance float64, l
 }
 
 func getLikelyLocations(last_seen_threshold int64, last_reading_threshold int64, locations_list Locations_list, cl *client.Client) {
+
+	fmt.Println("getLikelyLocations")
+	
 	// create the http results structure
 	http_results_lock.Lock()
 	http_results = HTTP_locations_list{}
