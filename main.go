@@ -250,7 +250,7 @@ func getLikelyLocations(last_seen_threshold int64, last_reading_threshold int64,
 	err = cl.Publish(&client.PublishOptions{
 		QoS:       mqtt.QoS0,
 		TopicName: []byte("/empresa/device/101/alive"),
-		Message:   []byte("1")
+		Message:   []byte("1"),
 	})
 	if err != nil {
 		panic(err)
