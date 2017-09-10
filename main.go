@@ -253,17 +253,17 @@ func getLikelyLocations(last_seen_threshold int64, last_reading_threshold int64,
 
 	// iterate through the beacons we want to search for
 	for _, beacon := range BEACONS.Beacons {
-		//fmt.Printf("doing iteration and saw %s with ID %s\n", beacon_name, beacon_id)
-		//fmt.Printf("num locs %d\n", len(locations))
+		fmt.Printf("doing iteration and saw %s with ID %s\n", beacon_name, beacon_id)
+		fmt.Printf("num locs %d\n", len(locations))
 		best_location := Best_location{}
 		//go through each location
 		now := time.Now().Unix()
 		for _, location := range locations_list.locations {
-			//fmt.Printf("doing iteration and saw location %s\n", location_name)
+			fmt.Printf("doing iteration and saw location %s\n", location_name)
 			// get last_seen for this location
 			found_b, ok := location.found_beacons[beacon.Beacon_id]
 			if ok {
-				//fmt.Printf("found %s in %s\n", beacon_id, location_name)
+				fmt.Printf("found %s in %s\n", beacon_id, location_name)
 				if (now - found_b.last_seen) > last_seen_threshold {
 					continue
 				}
@@ -279,21 +279,19 @@ func getLikelyLocations(last_seen_threshold int64, last_reading_threshold int64,
 
 		// debug stuff, show other candidates
 
-		/*
-			fmt.Printf("DEBUG: %s - best location: %s \n", beacon.Name, best_location.name)
-			for _, location := range locations_list.locations {
-				avg_distance := location.found_beacons[beacon.Beacon_id].average_distance
-				now = time.Now().Unix()
-				ago := now - location.found_beacons[beacon.Beacon_id].last_seen
-				fmt.Printf("\t%s - average: %f, metrics: %d, last_seen: %d\n", location.name, avg_distance, len(location.found_beacons[beacon.Beacon_id].beacon_metrics), ago)
-				fmt.Printf("\t\t")
-				for _, met := range location.found_beacons[beacon.Beacon_id].beacon_metrics {
-					fmt.Printf("%f ", met.distance)
-				}
-				fmt.Printf("\n")
+		fmt.Printf("DEBUG: %s - best location: %s \n", beacon.Name, best_location.name)
+		for _, location := range locations_list.locations {
+			avg_distance := location.found_beacons[beacon.Beacon_id].average_distance
+			now = time.Now().Unix()
+			ago := now - location.found_beacons[beacon.Beacon_id].last_seen
+			fmt.Printf("\t%s - average: %f, metrics: %d, last_seen: %d\n", location.name, avg_distance, len(location.found_beacons[beacon.Beacon_id].beacon_metrics), ago)
+			fmt.Printf("\t\t")
+			for _, met := range location.found_beacons[beacon.Beacon_id].beacon_metrics {
+				fmt.Printf("%f ", met.distance)
 			}
 			fmt.Printf("\n")
-		*/
+		}
+		fmt.Printf("\n")
 
 		//filter, only let this location become best if it was X times in a row
 		if best_location.name == beacon.Previous_location {
@@ -343,7 +341,7 @@ func getLikelyLocations(last_seen_threshold int64, last_reading_threshold int64,
 			beacon.Previous_confident_location = best_location.name
 
 			// clear all previous entries of this beacon from all locations, except this best one
-			//log.Println("before clear")
+			log.Println("before clear")
 
 			for k, location := range locations_list.locations {
 				log.Println(location.name, beacon.Name, len(location.found_beacons[beacon.Name].beacon_metrics))
@@ -352,20 +350,18 @@ func getLikelyLocations(last_seen_threshold int64, last_reading_threshold int64,
 				}
 				log.Println("deleting ", beacon.Name, "from ", location.name)
 				delete(location.found_beacons, beacon.Name)
-				/*
-					locbeac := location.found_beacons[beacon.Name]
-					locbeac.beacon_metrics = make([]Beacon_metric, 1)
-					location.found_beacons[beacon.Name] = locbeac
-				*/
+
+				locbeac := location.found_beacons[beacon.Name]
+				locbeac.beacon_metrics = make([]Beacon_metric, 1)
+				location.found_beacons[beacon.Name] = locbeac
+
 				locations_list.locations[k] = location
 			}
 
-			/*
 				log.Println("after clear")
 				for _, location := range locations {
 					log.Println(location.name, beacon.Name, len(location.found_beacons[beacon.Name].beacon_metrics))
 				}
-			*/
 		}
 
 		beacon.Previous_location = best_location.name
@@ -382,7 +378,7 @@ func getLikelyLocations(last_seen_threshold int64, last_reading_threshold int64,
 			}
 		}
 
-		//fmt.Printf("\n\n%s is most likely in %s with average distance %f \n\n", beacon.Name, best_location.name, best_location.distance)
+		fmt.Printf("\n\n%s is most likely in %s with average distance %f \n\n", beacon.Name, best_location.name, best_location.distance)
 		// publish this to a topic
 		// Publish a message.
 		err := cl.Publish(&client.PublishOptions{
@@ -460,13 +456,11 @@ func IncomingMQTTProcessor(updateInterval time.Duration, cl *client.Client, db *
 	}
 
 	//debug list them out
-	/*
 		fmt.Println("Database beacons:")
 		for _, beacon := range BEACONS.Beacons {
 			fmt.Println("Database has known beacon: " + beacon.Beacon_id + " " + beacon.Name)
 		}
-	*/
-	//fmt.Println("Settings has %#v\n", settings)
+	fmt.Println("Settings has %#v\n", settings)
 
 	Latest_beacons_list = make(map[string]Beacon)
 
@@ -488,7 +482,7 @@ func IncomingMQTTProcessor(updateInterval time.Duration, cl *client.Client, db *
 
 				now := time.Now().Unix()
 
-				//fmt.Println("saw " + this_beacon_id + " at " + incoming.Hostname)
+				fmt.Println("saw " + this_beacon_id + " at " + incoming.Hostname)
 
 				//if this beacon isn't in our search list, add it to the latest_beacons pile.
 				beacon, ok := BEACONS.Beacons[this_beacon_id]
@@ -532,7 +526,7 @@ func IncomingMQTTProcessor(updateInterval time.Duration, cl *client.Client, db *
 					locations_list.locations[incoming.Hostname] = Location{}
 					location, ok = locations_list.locations[incoming.Hostname]
 					location.found_beacons = make(map[string]Found_beacon)
-					//fmt.Println(location.name + " new location so making found_beacons map")
+					fmt.Println(location.name + " new location so making found_beacons map")
 					location.name = incoming.Hostname
 				}
 
